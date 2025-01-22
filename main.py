@@ -200,7 +200,7 @@ async def process_deactivate(callback_query: CallbackQuery, state: FSMContext):
         return
     elif callback_query.from_user.id in adminlist: 
         await state.set_state(UserState.deacti)
-        await callback_query.message.answer("Пиши id")
+        await callback_query.message.answer("Пиши Email")
         await callback_query.answer()
 
 @router.callback_query(lambda c: c.data == 'get_info')
@@ -211,7 +211,7 @@ async def process_get_info(callback_query: CallbackQuery, state: FSMContext):
         return
     elif callback_query.from_user.id in adminlist: 
         await state.set_state(UserState.get)
-        await callback_query.message.answer("Пиши id")
+        await callback_query.message.answer("Пиши Email")
         await callback_query.answer()
 
 @router.message(StateFilter(UserState.add))
@@ -236,7 +236,7 @@ async def process_deacti(message: Message, state: FSMContext):
         await state.clear()
         return
     elif message.from_user.id in adminlist: 
-        response = await get_req("/api/Subscription/DeactivateUser", "TgId", message.text)
+        response = await get_req("/api/Subscription/DeactivateUser", "Email", message.text)
 
         await message.answer(str(response))
         await state.clear()
@@ -251,7 +251,7 @@ async def process_get(message: Message, state: FSMContext):
         return
     elif message.from_user.id in adminlist: 
         print('hit_get')
-        response = await get_req("/api/Subscription/GetUserSub", "TgId", message.text)
+        response = await get_req("/api/Subscription/GetUserSub", "Email", message.text)
         answer = parse_response(response)
         
         await message.answer(answer)
