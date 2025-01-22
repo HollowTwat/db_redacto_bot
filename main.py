@@ -165,6 +165,7 @@ async def process_handler_getsubs(callback_query: CallbackQuery, state: FSMConte
                 [InlineKeyboardButton(text="30", callback_data="getsubstime_30")],
             ])
         )
+        await callback_query.answer()
 
 @router.callback_query(lambda c: c.data.startswith('getsubstime_'))
 async def process_time_period(callback_query: CallbackQuery, state: FSMContext):
@@ -189,6 +190,7 @@ async def process_addsub(callback_query: CallbackQuery, state: FSMContext):
     elif callback_query.from_user.id in adminlist: 
         await state.set_state(UserState.add)
         await callback_query.message.answer("Пиши почту")
+        await callback_query.answer()
 
 @router.callback_query(lambda c: c.data == 'deactivate')
 async def process_deactivate(callback_query: CallbackQuery, state: FSMContext):
@@ -199,6 +201,7 @@ async def process_deactivate(callback_query: CallbackQuery, state: FSMContext):
     elif callback_query.from_user.id in adminlist: 
         await state.set_state(UserState.deacti)
         await callback_query.message.answer("Пиши id")
+        await callback_query.answer()
 
 @router.callback_query(lambda c: c.data == 'get_info')
 async def process_get_info(callback_query: CallbackQuery, state: FSMContext):
@@ -209,6 +212,7 @@ async def process_get_info(callback_query: CallbackQuery, state: FSMContext):
     elif callback_query.from_user.id in adminlist: 
         await state.set_state(UserState.get)
         await callback_query.message.answer("Пиши id")
+        await callback_query.answer()
 
 @router.message(StateFilter(UserState.add))
 async def process_add(message: Message, state: FSMContext):
