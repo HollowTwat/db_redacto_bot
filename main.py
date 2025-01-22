@@ -141,6 +141,11 @@ async def addadmin_handler(message: Message) -> None:
     except ValueError:
         await message.reply("Invalid user ID. Please provide a numeric user ID.")
 
+@router.message(Command(commands=['getadmins']))
+async def getadmins_handler(message: Message) -> None:
+    adminlist = load_adminlist()
+    await message.reply(f"{adminlist}")
+
 @router.message(Command("menu"))
 async def menu_handler(message: Message) -> None:
     adminlist = load_adminlist()
