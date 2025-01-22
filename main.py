@@ -72,6 +72,17 @@ def format_transaction_data(transactions):
 
     return "\n".join(formatted_messages)
 
+def parse_response(response):
+    transaction = response[0]
+
+    amount = f"{transaction['amount']} {transaction['extra']['Currency']}" if 'Currency' in transaction['extra'] else f"{transaction['amount']} RUB"
+    tg = transaction['userTgId']
+    mail = transaction['email']
+    date = datetime.strptime(transaction['dateTime'], "%Y-%m-%dT%H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S")
+    promo = transaction['promo'] if transaction['promo'] is not None else "None"
+
+    return f"amount: {amount}\ntg: {tg}\nmail: {mail}\ndate: {date}\npromo: {promo}"
+
 async def get_req(method, inputname, input):
     url = f'https://nutridb-production.up.railway.app{method}?{inputname}={input}'
     print(url)
@@ -231,7 +242,7 @@ async def process_get(message: Message, state: FSMContext):
     elif message.from_user.id in adminlist: 
         print('hit_get')
         response = await get_req("/api/Subscription/GetUserSub", "TgId", message.text)
-        answer = str(response)
+        answer = parse_response(response)
         
         await message.answer(answer)
 
