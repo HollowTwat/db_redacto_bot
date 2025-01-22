@@ -65,10 +65,15 @@ def format_transaction_data(transactions):
         email = transaction.get('email')
         amount = transaction.get('amount')
         date_time_str = transaction.get('dateTime')
+        active = transaction.get('isActive')
+        if active:
+            active_emote = '✅'
+        if not active:
+            active_emote = '❌'
         
         date_time = datetime.fromisoformat(date_time_str).strftime('%d-%m-%y')
 
-        formatted_message = f"{email} ({amount}) {date_time}"
+        formatted_message = f"{email} ({amount}) {date_time} {active_emote}"
         formatted_messages.append(formatted_message)
 
     return "\n".join(formatted_messages)
@@ -81,13 +86,18 @@ def parse_response(response):
     amount = f"{transaction['amount']} {extra_data['Currency']}" if 'Currency' in extra_data else f"{transaction['amount']} RUB"
     tg = transaction['userTgId']
     mail = transaction['email']
+    active = transaction.get('isActive')
+    if active:
+        active_emote = '✅'
+    if not active:
+        active_emote = '❌'
     try:
         date = datetime.strptime(transaction['dateTime'], "%Y-%m-%dT%H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S")
     except ValueError:
         date = datetime.strptime(transaction['dateTime'], "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
     promo = transaction['promo'] if transaction['promo'] is not None else "None"
 
-    return f"amount: {amount}\ntg: {tg}\nmail: {mail}\ndate: {date}\npromo: {promo}"
+    return f"amount: {amount}\ntg: {tg}\nmail: {mail}\ndate: {date}\npromo: {promo} \nisActive: {active_emote}"
 
 async def get_req(method, inputname, input):
     url = f'https://nutridb-production.up.railway.app{method}?{inputname}={input}'
