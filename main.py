@@ -77,7 +77,7 @@ async def get_req(method, inputname, input):
     print(url)
 
     headers = {
-        "MyTok": f"{my_tok}"
+        "MyTok": my_tok
     }
 
     async with aiohttp.ClientSession() as session:
@@ -200,9 +200,9 @@ async def process_add(message: Message, state: FSMContext):
         await message.answer("You don't have permissions")
         return
     elif message.from_user.id in adminlist: 
-        answer = await get_req("/api/Subscription/AddSub", "Email", message.text)
+        response = await get_req("/api/Subscription/AddSub", "Email", message.text)
         
-        await message.answer(str(answer))
+        await message.answer(str(response))
         await state.clear()
         return
 
@@ -215,9 +215,9 @@ async def process_deacti(message: Message, state: FSMContext):
         await state.clear()
         return
     elif message.from_user.id in adminlist: 
-        answer = await get_req("/api/Subscription/DeactivateUser", "TgId", message.text)
+        response = await get_req("/api/Subscription/DeactivateUser", "TgId", message.text)
 
-        await message.answer(str(answer))
+        await message.answer(str(response))
         await state.clear()
         return
 
@@ -230,8 +230,10 @@ async def process_get(message: Message, state: FSMContext):
         return
     elif message.from_user.id in adminlist: 
         print('hit_get')
-        answer = await get_req("/api/Subscription/GetUserSub", "TgId", message.text)
-        await message.answer(str(answer))
+        response = await get_req("/api/Subscription/GetUserSub", "TgId", message.text)
+        answer = str(response)
+        
+        await message.answer(answer)
 
         await state.clear()
         return
