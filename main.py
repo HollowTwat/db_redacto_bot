@@ -2,6 +2,7 @@ import asyncio
 import logging
 import sys
 import os
+import json
 from datetime import datetime, timedelta
 import aiohttp
 from aiogram import Bot, Dispatcher, html, Router, BaseMiddleware
@@ -75,7 +76,9 @@ def format_transaction_data(transactions):
 def parse_response(response):
     transaction = response[0]
 
-    amount = f"{transaction['amount']} {transaction['extra']['Currency']}" if 'Currency' in transaction['extra'] else f"{transaction['amount']} RUB"
+    extra_data = json.loads(transaction['extra'])
+
+    amount = f"{transaction['amount']} {extra_data['Currency']}" if 'Currency' in extra_data else f"{transaction['amount']} RUB"
     tg = transaction['userTgId']
     mail = transaction['email']
     date = datetime.strptime(transaction['dateTime'], "%Y-%m-%dT%H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S")
