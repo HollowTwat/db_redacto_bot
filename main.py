@@ -16,7 +16,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 import shelve
 
-adminlist = [464682207, 389054202, 42599312]
+adminlist = [464682207, 389054202, 42599312, 7726313921]
 my_tok = os.getenv("my_tok")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
