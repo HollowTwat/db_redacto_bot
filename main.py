@@ -100,7 +100,7 @@ def parse_response(response):
 
         return f"amount: {amount}\ntg: {tg}\nmail: {mail}\ndate: {date}\npromo: {promo} \nisActive: {active_emote}"
     except (IndexError, KeyError, json.JSONDecodeError) as e:
-        return "user not in db"
+        return "Юзер в дб не найден"
 
 async def get_req(method, inputname, input):
     url = f'https://nutridb-production.up.railway.app{method}?{inputname}={input}'
