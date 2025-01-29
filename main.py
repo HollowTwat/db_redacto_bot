@@ -79,25 +79,28 @@ def format_transaction_data(transactions):
     return "\n".join(formatted_messages)
 
 def parse_response(response):
-    transaction = response[0]
-
-    extra_data = json.loads(transaction['extra'])
-
-    amount = f"{transaction['amount']} {extra_data['Currency']}" if 'Currency' in extra_data else f"{transaction['amount']} RUB"
-    tg = transaction['userTgId']
-    mail = transaction['email']
-    active = transaction.get('isActive')
-    if active:
-        active_emote = '✅'
-    if not active:
-        active_emote = '❌'
     try:
-        date = datetime.strptime(transaction['dateTime'], "%Y-%m-%dT%H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        date = datetime.strptime(transaction['dateTime'], "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
-    promo = transaction['promo'] if transaction['promo'] is not None else "None"
+        transaction = response[0]
 
-    return f"amount: {amount}\ntg: {tg}\nmail: {mail}\ndate: {date}\npromo: {promo} \nisActive: {active_emote}"
+        extra_data = json.loads(transaction['extra'])
+
+        amount = f"{transaction['amount']} {extra_data['Currency']}" if 'Currency' in extra_data else f"{transaction['amount']} RUB"
+        tg = transaction['userTgId']
+        mail = transaction['email']
+        active = transaction.get('isActive')
+        if active:
+            active_emote = '✅'
+        if not active:
+            active_emote = '❌'
+        try:
+            date = datetime.strptime(transaction['dateTime'], "%Y-%m-%dT%H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            date = datetime.strptime(transaction['dateTime'], "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
+        promo = transaction['promo'] if transaction['promo'] is not None else "None"
+
+        return f"amount: {amount}\ntg: {tg}\nmail: {mail}\ndate: {date}\npromo: {promo} \nisActive: {active_emote}"
+    except (IndexError, KeyError, json.JSONDecodeError) as e:
+        return "user not in db"
 
 async def get_req(method, inputname, input):
     url = f'https://nutridb-production.up.railway.app{method}?{inputname}={input}'
