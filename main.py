@@ -241,7 +241,7 @@ async def process_add(message: Message, state: FSMContext):
     elif message.from_user.id in adminlist: 
         response = await get_req("/api/Subscription/AddSub", "Email", message.text)
         
-        await message.answer(str(response))
+        await message.answer(f"Статус активации пользователя {message.text}: {str(response)}")
         await state.clear()
         return
 
@@ -256,7 +256,7 @@ async def process_deacti(message: Message, state: FSMContext):
     elif message.from_user.id in adminlist: 
         response = await get_req("/api/Subscription/DeactivateUser", "Email", message.text)
 
-        await message.answer(str(response))
+        await message.answer(f"Статус деактивации пользователя {message.text}: {str(response)}")
         await state.clear()
         return
 
