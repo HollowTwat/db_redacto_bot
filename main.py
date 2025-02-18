@@ -97,9 +97,9 @@ def parse_response(response):
         except ValueError:
             date = datetime.strptime(transaction['dateTime'], "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
         # promo = transaction['promo'] if transaction['promo'] is not None else "None"
-        promo = transaction.get('promo', "None")
+        # promo = transaction.get('promo', "None")  \npromo: {promo} 
 
-        return f"amount: {amount}\ntg: {tg}\nmail: {mail}\ndate: {date}\npromo: {promo} \nisActive: {active_emote}"
+        return f"amount: {amount}\ntg: {tg}\nmail: {mail}\ndate: {date}\nisActive: {active_emote}"
     except (IndexError, KeyError, json.JSONDecodeError) as e:
         print(e)
         return "Юзер в дб не найден"
