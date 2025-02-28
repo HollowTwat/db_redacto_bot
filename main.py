@@ -281,11 +281,18 @@ async def process_get(message: Message, state: FSMContext):
         return
 
 async def send_long_message(message, text, max_length=4096):
-    """
-    Splits a long message into chunks and sends them separately.
-    """
-    for i in range(0, len(text), max_length):
-        chunk = text[i:i + max_length]
+    lines = text.split('\n')
+    chunk = ""
+    
+    for line in lines:
+        # Check if adding the next line would exceed the max_length
+        if len(chunk) + len(line) + 1 > max_length:  # +1 for the newline character
+            if chunk:  # Send the current chunk if it's not empty
+                await message.answer(chunk, parse_mode=ParseMode.MARKDOWN)
+                chunk = ""  # Reset the chunk
+        chunk += line + '\n'  # Add the line to the current chunk
+    
+    if chunk:
         await message.answer(chunk, parse_mode=ParseMode.MARKDOWN)
 
 async def handle_response(callback_query, response):
