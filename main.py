@@ -59,24 +59,24 @@ async def get_date_time_backwards(days: int) -> str:
     past_date = now - timedelta(days=days)
     return past_date.strftime("%Y-%m-%d %H:%M:%S")
 
-def format_transaction_data(transactions):
-    formatted_messages = []
-    for transaction in transactions:
-        email = transaction.get('email')
-        amount = transaction.get('amount')
-        date_time_str = transaction.get('dateTime')
-        active = transaction.get('isActive')
-        if active:
-            active_emote = '✅'
-        if not active:
-            active_emote = '❌'
+# def format_transaction_data(transactions):
+#     formatted_messages = []
+#     for transaction in transactions:
+#         email = transaction.get('email')
+#         amount = transaction.get('amount')
+#         date_time_str = transaction.get('dateTime')
+#         active = transaction.get('isActive')
+#         if active:
+#             active_emote = '✅'
+#         if not active:
+#             active_emote = '❌'
         
-        date_time = datetime.fromisoformat(date_time_str).strftime('%d-%m-%y')
+#         date_time = datetime.fromisoformat(date_time_str).strftime('%d-%m-%y')
 
-        formatted_message = f"{email} ({amount}) {date_time} {active_emote}"
-        formatted_messages.append(formatted_message)
+#         formatted_message = f"{email} ({amount}) {date_time} {active_emote}"
+#         formatted_messages.append(formatted_message)
 
-    return "\n".join(formatted_messages)
+#     return "\n".join(formatted_messages)
 
 def parse_response(response):
     try:
@@ -163,7 +163,7 @@ async def menu_handler(message: Message) -> None:
             "Менюшка",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Получить список", callback_data="handler_getsubs")],
-                [InlineKeyboardButton(text="Активировать юзера", callback_data="addsub")],
+                [InlineKeyboardButton(text="Выдать подписку", callback_data="addsub")],
                 [InlineKeyboardButton(text="Отключить юзера", callback_data="deactivate")],
                 [InlineKeyboardButton(text="Получить инфу по юзеру", callback_data="get_info")],
             ])
@@ -197,8 +197,9 @@ async def process_time_period(callback_query: CallbackQuery, state: FSMContext):
         result_date = await get_date_time_backwards(days)
         await callback_query.message.answer(f"Here is the date {days} days ago: {result_date}")
         response = await get_req("/api/Subscription/GetSubs", "MyDateTime", result_date)
-        response_formatted = format_transaction_data(response)
-        await callback_query.message.answer(str(response_formatted))
+        # response_formatted = format_transaction_data(response)
+        # await callback_query.message.answer(str(response_formatted))
+        await handle_response(callback_query, response)
 
 
 @router.callback_query(lambda c: c.data == 'addsub')
@@ -243,7 +244,7 @@ async def process_add(message: Message, state: FSMContext):
     elif message.from_user.id in adminlist: 
         response = await get_req("/api/Subscription/AddSub", "Email", message.text)
         
-        await message.answer(f"Статус активации пользователя {message.text}: {str(response)}")
+        await message.answer(f"Статус выдачи подписки пользователю {message.text}: {str(response)}")
         await state.clear()
         return
 
@@ -278,6 +279,34 @@ async def process_get(message: Message, state: FSMContext):
 
         await state.clear()
         return
+
+async def send_long_message(message, text, max_length=4096):
+    """
+    Splits a long message into chunks and sends them separately.
+    """
+    for i in range(0, len(text), max_length):
+        chunk = text[i:i + max_length]
+        await message.answer(chunk, parse_mode=ParseMode.MARKDOWN)
+
+async def handle_response(callback_query, response):
+    response_formatted = format_transaction_data(response)
+    await send_long_message(callback_query.message, response_formatted)
+
+def format_transaction_data(transactions):
+    formatted_messages = []
+    for transaction in transactions:
+        email = transaction.get('email')
+        amount = transaction.get('amount')
+        date_time_str = transaction.get('dateTime')
+        active = transaction.get('isActive')
+        active_emote = '✅' if active else '❌'
+        
+        date_time = datetime.fromisoformat(date_time_str).strftime('%d-%m-%y')
+
+        formatted_message = f"{email} ({amount}) {date_time} {active_emote}"
+        formatted_messages.append(formatted_message)
+
+    return "\n".join(formatted_messages)
 
 async def main() -> None:
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
